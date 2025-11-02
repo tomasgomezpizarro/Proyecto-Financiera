@@ -1,0 +1,11 @@
+Financiera: 
+ Teórico: 
+Porqué cambiar la variable?
+Cuentas del cambio de variable 
+Condiciones iniciales y de contorno -> Usar cambio de variable. Explixar pq f(0, t)=K. Ver como se presenta la frontera en el apunte vs en otra bibliografia
+ Experimentos: 
+Ver como varía la región de ejercicio temprano a medida que  se refina la maya
+Comparar precio europea con americana a medida que aumentamos el techo
+Mostrar porque es buena la eleccion del DZ óptima
+Comparar velocidades/precision: implicito/explicito con/sin cambio de variable
+Usar para datos reales
