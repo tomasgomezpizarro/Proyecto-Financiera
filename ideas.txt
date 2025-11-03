@@ -6,8 +6,7 @@ Condiciones iniciales y de contorno -> Usar cambio de variable. Explixar pq f(0,
  Experimentos: 
 Ver como varía la región de ejercicio temprano a medida que  se refina la maya
 Variar también parámetros y ver como varía la frontera
-Comparar precio europea con americana a medida que aumentamos el techo (aclara que tipo de techo pajin la primera vez q lo lei no entendi)
+Comparar precio europea con americana a medida que aumentamos el techo
 Mostrar porque es buena la eleccion del DZ óptima
 Comparar velocidades/precision: implicito/explicito con/sin cambio de variable
-Usar para datos reales
 el pajaro es un putooooo

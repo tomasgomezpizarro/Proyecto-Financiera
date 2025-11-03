@@ -1,0 +1,41 @@
+Los proyectos consisten en temas de investigación breves sobre contenidos vinculados a los desarrollados en clase, para ser realizados en grupo.
+
+Condiciones:
+
+Todos los proyectos requieren de una implementación en computadora, o bien mediante una planilla de cálculo o un código en lenguaje a elección (preferiblemente Python).
+La asignación de proyectos a cada grupo la realiza la cátedra.
+Aprobar el proyecto es condición para acceder a la regularidad y a la promoción de la matreria, no llevará nota sino que su evaliuación será aprobado o no.
+La evaluación del proyecto se hará en base al informe presentado y la exposición oral en formato de seminario breve.
+ Quienes necesiten aprobar la materia a través de examen y no tengan aprobado el proyecto, deberán presentar el informe del mismo al menos tres días hábiles antes de la fecha del examen.
+Etapas:
+
+estudiar un tema a partir de la propuesta asignada y de la bibliografía sugerida,
+implementar una solución en computadora,
+elaborar un informe conciso,
+preparar una exposición oral para presentar los resultados.
+Fechas:
+
+límite para la entrega de informes: jueves  6 de noviembre 23:55 hs,
+exposiciones orales: jueves 13 de noviembre y lunes 17 de noviembre 14-18 hs.
+Esquema base del informe:
+
+ Título, autores y fecha.
+ Breve introducción al tema (los contenidos de clase se asumen conocidos).
+ Desarrollo de lo realizado (se apreciarán las presentaciones gráficas).
+ Conclusiones (imprescindible).
+Notas:
+
+El texto y referencias del informe no tienen que superar las tres páginas A4 en tamaño 11pt (sin contar figuras) y sólo se acepta un archivo en PDF por informe con un máximo de 2MB.
+Es suficiente que solo uno de los estudiantes del grupo eleve el informe.
+Las planillas de cálculo o código compartirlos mediante link a repositorio externo (google sheets, colab, etc). Verificar que se hayan compartido los permisos de lectura necesarios.
+Comunicar el link a través de un comentario en la entrega.
+La exposición oral debe realizarse de forma conjunta por el grupo en 15 min como máximo! (el uso del tiempo es objeto de la evaluación).
+
+TEMA: DIFERENCIAS FINITAS PARA VALORACIÓN DE OPCIONES AMERICANAS
+La valoración de un derivado implica resolver una ecuación diferencial en derivadas parciales. Los
+métodos de diferencias finitas son métodos numéricos que convierten a la ecuación diferencial en un
+conjunto de ecuaciones en diferencias que pueden ser resueltas de manera iterativa.
+El libro de Hull aborda estos métodos en la sección 21.8. Se pide realizar un informe e implementación
+que muestre la valoración de opciones americanas, explorando en particular el uso del cambio de variable
+S por ln(S).
+
