@@ -10,3 +10,4 @@ Comparar precio europea con americana a medida que aumentamos el techo (aclara q
 Mostrar porque es buena la eleccion del DZ óptima
 Comparar velocidades/precision: implicito/explicito con/sin cambio de variable
 Usar para datos reales
+el pajaro es un putooooo
