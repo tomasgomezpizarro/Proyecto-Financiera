@@ -29,7 +29,15 @@
 
 \section{Presentación del problema}
 
-\subsection{La ecuación diferencial}
+El valor de una opción, $V(S, t)$, sobre un activo que paga un dividendo continuo a una tasa $q$, satisface la ecuación diferencial parcial de Black-Scholes:
+\[
+\frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + (r-q)S \frac{\partial V}{\partial S} - rV = 0
+\]
+Esta ecuación es la misma para opciones de compra (call) y de venta (put), pero sus condiciones de contorno y finales son diferentes.
+
+Para una opción de compra americana sobre un activo que no paga dividendos ($q=0$), nunca es óptimo ejercerla antes del vencimiento. Por lo tanto, su valor es el mismo que el de una opción europea, el cual puede calcularse directamente con la fórmula de Black-Scholes.
+
+En cambio, para una opción de venta americana (incluso sin dividendos) o una opción de compra americana sobre un activo que sí paga dividendos, el ejercicio temprano puede ser óptimo. Esto hace que su valoración requiera métodos numéricos.
 
 \subsection{El cambio de variable}
 
