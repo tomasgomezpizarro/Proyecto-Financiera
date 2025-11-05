@@ -49,13 +49,34 @@ En cambio, para una opción de venta americana (incluso sin dividendos) o una op
 
 \section{Resultados obtenidos}
 
+\subsection{Velocidades y precisión en los distintos métodos}
+
 \subsection{La región de ejercicio temprano}
 
 \subsection{La condición de contorno artificial}
 
-\subsection{La elección del $\Delta Z$ óptimo}
+Para resolver la EDP numéricamente, es necesario truncar el dominio infinito del precio del activo, \(S \in [0, \infty)\), a un intervalo finito. En nuestro enfoque, este truncamiento se realiza en la variable logarítmica \(Z = \ln S\) y es controlado por un parámetro \(L\). El dominio computacional se define como:
+\[
+Z \in \big[\ln K - L\sigma\sqrt{T}, \ln K + L\sigma\sqrt{T}\big]
+\]
+Esto es equivalente a un dominio en precios de \(S \in \big[K e^{-L\sigma\sqrt{T}}, K e^{L\sigma\sqrt{T}}\big]\). En estas fronteras artificiales, se imponen condiciones de contorno que asumen un comportamiento conocido de la opción (por ejemplo, para una put, que su valor se aproxima a \(K\) para \(S \to 0\) y a \(0\) para \(S \to \infty\)).
 
-\subsection{Velocidades y precisión en los distintos métodos}
+La elección de \(L\) introduce un compromiso fundamental en la precisión del método. Si se mantienen fijos los pasos de discretización espacial (\(M\)) y temporal (\(N\)), se observa un comportamiento característico del error, como se ilustra en la Figura~\ref{fig:error_vs_L}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{imagenes/Cambio_en_L.png}
+    \caption{Error absoluto en el precio de la opción en función del parámetro de ancho de dominio \(L\), manteniendo fijos el número de pasos espaciales (\(M=200\)) y temporales (\(N=5000\)).}
+    \label{fig:error_vs_L}
+\end{figure}
+
+Del análisis de la figura se desprenden dos conclusiones clave:
+\begin{itemize}
+    \item \textbf{\(L\) demasiado pequeño}: Para valores bajos de \(L\) (e.g., \(L < 4\)), el error es significativamente alto. Esto ocurre porque el dominio es demasiado estrecho y la solución numérica es "contaminada" por las condiciones de contorno artificiales, que no representan adecuadamente el comportamiento real de la opción lejos del strike.
+    \item \textbf{\(L\) demasiado grande}: A medida que \(L\) aumenta más allá de un punto óptimo (e.g., \(L > 8\)), el error comienza a crecer nuevamente. Con \(M\) fijo, un dominio más grande implica un paso de discretización espacial \(\Delta Z = \frac{2L\sigma\sqrt{T}}{M}\) mayor. Por lo tanto, el error de discretización, que depende de \(\Delta Z\), se vuelve la fuente dominante de imprecisión.
+\end{itemize}
+
+El gráfico muestra que existe una región óptima para \(L\) (aproximadamente entre 4 y 8) donde el error combinado de las condiciones de contorno y la discretización es mínimo. Esto justifica la elección de un valor como \(L=6\) para los otros experimentos, ya que se encuentra en esta zona de estabilidad.
 
 \subsection{Evaluando el modelo con datos reales}
 

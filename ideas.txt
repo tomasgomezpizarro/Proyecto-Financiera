@@ -7,8 +7,13 @@ No se puede resolver el sistema y después aplicar la condición -> PSOR
 Condiciones iniciales y de contorno -> Usar cambio de variable. Explixar pq f(0, t)=K. Ver como se presenta la frontera en el apunte vs en otra bibliografia
  Experimentos: 
 Ver como varía la región de ejercicio temprano a medida que  se refina la maya
-Variar también parámetros y ver como varía la frontera
 Comparar precio europea con americana a medida que aumentamos el techo
-Mostrar porque es buena la eleccion del DZ óptima
-Comparar velocidades/precision: implicito/explicito con/sin cambio de variable
+    $L$ demasiado pequeño: El error de las condiciones de contorno domina.
+    $L$ demasiado grande: El error de discretización (por el dx grande) domina.
+Velocidades y precisión en los distintos métodos
+    Mostrar porque es buena la eleccion del DZ óptima
+    El explicito no es menos preciso pero si más inestable
+    Refinar la malla no sirve si no aumentas el dt
+    El implicito PSOR es más lento pero más preciso
+    Black - Scholes es siempre menor
 Comparar con precios de mercado > DF > Black - Scholes
