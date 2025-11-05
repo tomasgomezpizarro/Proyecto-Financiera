@@ -51,33 +51,34 @@ En cambio, para una opción de venta americana (incluso sin dividendos) o una op
 
 \subsection{Velocidades y precisión en los distintos métodos}
 
+Se comparó los distintos métodos abordados (explícito, implícito con proyección y implícito con PSOR) en cuestión de precisión y tiempo de cómputo, variando el parámetro $C$ tq \(\Delta Z =  C \sqrt{\Delta t}\) que controla la relación entre los pasos espaciales y temporales en la discretización. Los gráficos de los resultados obtenidos se pueden ver en \href{https://pde-results-visualizer.streamlit.app/}{pde-results-visualizer.streamlit.app}.
+
+\begin{itemize}
+    \item \textbf{Precisión:} Para medir el error, se uso la librería QuantLib, que proporciona una valuación precisa de derivados. El método PSOR implícito tuvo una mejor precisión, aunque leve, que el método de proyección simple, lo cuál era de esperar. Todos los métodos son de órden 1 en tiempo y 2 en el espacio, por lo que el método explicito no obtuvo peores resultados que los métodos implícitos. Sin embargo, divergía para valores grandes de \(C\) (es decir, cuando \(\Delta t\) es muy grande en relación a \((\Delta Z)^2\)).
+    
+    \item \textbf{Velocidad:} Como era de esperar, el método explícito fue el más rápido, seguido por el implícito con proyección y finalmente el implícito con PSOR.
+    
+    \item \textbf{Impacto de la discretización:} Reducir \(\Delta Z\) (un \(C\) más pequeño) más allá de cierto punto no mejora sustancialmente la precisión, pero sí incrementa el tiempo de cómputo. Para una mayor precisión, es más eficiente reducir el paso temporal \(\Delta t\). El libro de referencia \cite{Hull} propone la elección \(\Delta Z = \sqrt{3\Delta t}\) (equivalente a \(C=\sqrt{3}\)).
+    
+    \item \textbf{Valor del ejercicio temprano:} Como es de esperar, el valor de la opción americana siempre resulta superior al de su contraparte europea.
+\end{itemize}
+
 \subsection{La región de ejercicio temprano}
 
 \subsection{La condición de contorno artificial}
 
-Para resolver la EDP numéricamente, es necesario truncar el dominio infinito del precio del activo, \(S \in [0, \infty)\), a un intervalo finito. En nuestro enfoque, este truncamiento se realiza en la variable logarítmica \(Z = \ln S\) y es controlado por un parámetro \(L\). El dominio computacional se define como:
-\[
-Z \in \big[\ln K - L\sigma\sqrt{T}, \ln K + L\sigma\sqrt{T}\big]
-\]
-Esto es equivalente a un dominio en precios de \(S \in \big[K e^{-L\sigma\sqrt{T}}, K e^{L\sigma\sqrt{T}}\big]\). En estas fronteras artificiales, se imponen condiciones de contorno que asumen un comportamiento conocido de la opción (por ejemplo, para una put, que su valor se aproxima a \(K\) para \(S \to 0\) y a \(0\) para \(S \to \infty\)).
+Para resolver la EDP numéricamente, el dominio infinito del precio del activo se trunca a un intervalo finito. Este se define en la variable logarítmica \(Z = \ln S\) mediante un parámetro \(L\), resultando en el dominio computacional \(Z \in \big[\ln K \pm L\sigma\sqrt{T}\big]\).
 
-La elección de \(L\) introduce un compromiso fundamental en la precisión del método. Si se mantienen fijos los pasos de discretización espacial (\(M\)) y temporal (\(N\)), se observa un comportamiento característico del error, como se ilustra en la Figura~\ref{fig:error_vs_L}.
+La elección de \(L\) implica un compromiso. Como se observa en la Figura~\ref{fig:error_vs_L}, un valor de \(L\) demasiado pequeño introduce un error significativo porque las condiciones de contorno artificiales están demasiado cerca de la región de interés. Por otro lado, un \(L\) demasiado grande (con \(M\) fijo) aumenta el paso de discretización \(\Delta Z\), haciendo que el error de truncamiento domine.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{imagenes/Cambio_en_L.png}
-    \caption{Error absoluto en el precio de la opción en función del parámetro de ancho de dominio \(L\), manteniendo fijos el número de pasos espaciales (\(M=200\)) y temporales (\(N=5000\)).}
+    \caption{Error absoluto en función del parámetro de ancho de dominio \(L\), con \(M=200\) y \(N=5000\) fijos.}
     \label{fig:error_vs_L}
 \end{figure}
 
-Del análisis de la figura se desprenden dos conclusiones clave:
-\begin{itemize}
-    \item \textbf{\(L\) demasiado pequeño}: Para valores bajos de \(L\) (e.g., \(L < 4\)), el error es significativamente alto. Esto ocurre porque el dominio es demasiado estrecho y la solución numérica es "contaminada" por las condiciones de contorno artificiales, que no representan adecuadamente el comportamiento real de la opción lejos del strike.
-    \item \textbf{\(L\) demasiado grande}: A medida que \(L\) aumenta más allá de un punto óptimo (e.g., \(L > 8\)), el error comienza a crecer nuevamente. Con \(M\) fijo, un dominio más grande implica un paso de discretización espacial \(\Delta Z = \frac{2L\sigma\sqrt{T}}{M}\) mayor. Por lo tanto, el error de discretización, que depende de \(\Delta Z\), se vuelve la fuente dominante de imprecisión.
-\end{itemize}
-
-El gráfico muestra que existe una región óptima para \(L\) (aproximadamente entre 4 y 8) donde el error combinado de las condiciones de contorno y la discretización es mínimo. Esto justifica la elección de un valor como \(L=6\) para los otros experimentos, ya que se encuentra en esta zona de estabilidad.
-
+El análisis empírico revela una región óptima para \(L\) (aproximadamente entre 4 y 8) donde el error total es mínimo. Basado en esto, se eligió un valor de \(L=6\) para los demás experimentos, asegurando que la solución no sea sensible a las fronteras artificiales.
 \subsection{Evaluando el modelo con datos reales}
 
 \begin{thebibliography}{9}
