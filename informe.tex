@@ -51,14 +51,14 @@ En cambio, para una opción de venta americana (incluso sin dividendos) o una op
 
 \subsection{Velocidades y precisión en los distintos métodos}
 
-Se comparó los distintos métodos abordados (explícito, implícito con proyección y implícito con PSOR) en cuestión de precisión y tiempo de cómputo, variando el parámetro $C$ tq \(\Delta Z =  C \sqrt{\Delta t}\) que controla la relación entre los pasos espaciales y temporales en la discretización. Los gráficos de los resultados obtenidos se pueden ver en \href{https://pde-results-visualizer.streamlit.app/}{pde-results-visualizer.streamlit.app}.
+Se comparó los distintos métodos abordados (explícito, implícito con proyección y implícito con PSOR) en cuestión de precisión y tiempo de cómputo, variando el parámetro $C$ tq \(\Delta Z = C \sigma \sqrt{\Delta t}\) que controla la relación entre los pasos espaciales y temporales en la discretización. Los gráficos de los resultados obtenidos se pueden ver en \href{https://pde-results-visualizer.streamlit.app/}{pde-results-visualizer.streamlit.app}.
 
 \begin{itemize}
     \item \textbf{Precisión:} Para medir el error, se uso la librería QuantLib, que proporciona una valuación precisa de derivados. El método PSOR implícito tuvo una mejor precisión, aunque leve, que el método de proyección simple, lo cuál era de esperar. Todos los métodos son de órden 1 en tiempo y 2 en el espacio, por lo que el método explicito no obtuvo peores resultados que los métodos implícitos. Sin embargo, divergía para valores grandes de \(C\) (es decir, cuando \(\Delta t\) es muy grande en relación a \((\Delta Z)^2\)).
     
     \item \textbf{Velocidad:} Como era de esperar, el método explícito fue el más rápido, seguido por el implícito con proyección y finalmente el implícito con PSOR.
     
-    \item \textbf{Impacto de la discretización:} Reducir \(\Delta Z\) (un \(C\) más pequeño) más allá de cierto punto no mejora sustancialmente la precisión, pero sí incrementa el tiempo de cómputo. Para una mayor precisión, es más eficiente reducir el paso temporal \(\Delta t\). El libro de referencia \cite{Hull} propone la elección \(\Delta Z = \sqrt{3\Delta t}\) (equivalente a \(C=\sqrt{3}\)).
+    \item \textbf{Impacto de la discretización:} Reducir \(\Delta Z\) (un \(C\) más pequeño) más allá de cierto punto no mejora sustancialmente la precisión, pero sí incrementa el tiempo de cómputo. Para una mayor precisión, es más eficiente reducir el paso temporal \(\Delta t\). El libro de referencia \cite{Hull} propóne la elección \(\Delta Z = \sqrt{3\Delta t}\) (equivalente a \(C=\sqrt{3}\)). Se puede observar como, para valores menores a este, el método explícito se empieza a volver inestable.
     
     \item \textbf{Valor del ejercicio temprano:} Como es de esperar, el valor de la opción americana siempre resulta superior al de su contraparte europea.
 \end{itemize}
