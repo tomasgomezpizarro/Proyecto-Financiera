@@ -39,11 +39,32 @@ Para una opción de compra americana sobre un activo que no paga dividendos ($q=
 
 En cambio, para una opción de venta americana (incluso sin dividendos) o una opción de compra americana sobre un activo que sí paga dividendos, el ejercicio temprano puede ser óptimo. Esto hace que su valoración requiera métodos numéricos.
 
-\subsection{El cambio de variable}
+\subsection{El esquema de diferencias finitas}
+
+Para resolver la EDP numéricamente, primero discretizamos el dominio. Creamos una grilla dividiendo el tiempo hasta el vencimiento \(T\) en \(N\) intervalos de tamaño \(\Delta t = T/N\), y el precio del activo \(S\) en \(M\) intervalos \(\Delta S\). Así, denotamos \(V_{i,j} \approx V(i\Delta S, j\Delta t)\).
+
+Reemplazamos las derivadas en la EDP de Black-Scholes por aproximaciones en diferencias finitas. La derivada temporal se aproxima con una diferencia hacia atrás: \(\frac{\partial V}{\partial t} \approx \frac{V_{i,j} - V_{i,j-1}}{\Delta t}\).
+
+En el \textbf{esquema explícito}, las derivadas espaciales se evalúan en el tiempo conocido \(j-1\). Esto permite despejar \(V_{i,j}\) directamente. Para una opción americana, el valor no puede ser menor que su valor de ejercicio intrínseco. Por lo tanto, en cada paso se aplica la condición de ejercicio temprano:
+\[
+V_{i,j} = \max(\text{valor intrínseco}_i, A'_i V_{i-1,j-1} + B'_i V_{i,j-1} + C'_i V_{i+1,j-1})
+\]
+Este método es simple pero solo es estable bajo condiciones restrictivas que relacionan \(\Delta t\) y \(\Delta S\).
+
+Una alternativa más robusta es el \textbf{esquema implícito}, que evalúa las derivadas espaciales en el tiempo \(j\). Esto genera un sistema de ecuaciones lineales tridiagonal para los valores \(V_{i,j}\) en cada paso de tiempo:
+\[
+A_i V_{i-1,j} + B_i V_{i,j} + C_i V_{i+1,j} = D_i V_{i,j-1}
+\]
+Para opciones americanas, la condición de ejercicio introduce una no linealidad. Un enfoque simple, conocido como método de proyección, es resolver primero el sistema lineal (ignorando el ejercicio temprano) y luego aplicar la condición:
+\[
+V_{i,j}^{\text{final}} = \max(\text{valor intrínseco}_i, V_{i,j}^{\text{solución lineal}})
+\]
+Aunque este método funciona, no garantiza que la solución final satisfaga el sistema de ecuaciones original. Existen métodos más sofisticados, como el \textit{Projected Successive Over-Relaxation} (PSOR), que incorporan la restricción de ejercicio directamente en el proceso de resolución iterativa del sistema, asegurando consistencia y precisión \cite{Liu2008}.
 
 \subsection{Condiciones de borde}
 
-\subsection{El método explicito vs implicito}
+
+\subsection{El cambio de variable}
 
 \section{Resultados obtenidos}
 
@@ -63,6 +84,15 @@ Se comparó los distintos métodos abordados (explícito, implícito con proyecc
 
 \subsection{La región de ejercicio temprano}
 
+La Figura~\ref{fig:ejercicio_temprano} ilustra la región de ejercicio temprano para una opción de venta (put) americana. Es óptimo ejercer la opción cuando el precio del activo es suficientemente bajo. La línea roja, conocida como la frontera de ejercicio, separa la región de continuación (donde es mejor mantener la opción) de la región de ejercicio (sombreada). A medida que se acerca el vencimiento, esta frontera converge hacia el precio de ejercicio.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{imagenes/ejercicio_temprano.png}
+    \caption{Región de ejercicio temprano para un put americano con K=120, T=2 años, r=5\%, $\sigma$=40\%.}
+    \label{fig:ejercicio_temprano}
+\end{figure}
+
 \subsection{La condición de contorno artificial}
 
 Para resolver la EDP numéricamente, el dominio infinito del precio del activo se trunca a un intervalo finito. Este se define en la variable logarítmica \(Z = \ln S\) mediante un parámetro \(L\), resultando en el dominio computacional \(Z \in \big[\ln K \pm L\sigma\sqrt{T}\big]\).
@@ -77,11 +107,22 @@ La elección de \(L\) implica un compromiso. Como se observa en la Figura~\ref{f
 \end{figure}
 
 El análisis empírico revela una región óptima para \(L\) (aproximadamente entre 4 y 8) donde el error total es mínimo. Basado en esto, se eligió un valor de \(L=6\) para los demás experimentos, asegurando que la solución no sea sensible a las fronteras artificiales.
+
 \subsection{Evaluando el modelo con datos reales}
+
+Para poner a prueba el modelo, se valoró una opción \textit{put} americana \textit{at-the-money} (ATM) sobre acciones de NVIDIA (NVDA) con vencimiento a 15 días, utilizando datos de mercado del 6 de noviembre de 2025.
+
+Se utilizaron parámetros de mercado aproximados: para la tasa libre de riesgo \(r\), se tomó el punto medio (3.875\%) del rango objetivo de la Tasa de Fondos Federales, y la volatilidad implícita (56.47\%) se calculó a partir de una opción \textit{call} de referencia, siendo este un valor consistente con el dato de mercado (56.25\%).
+
+El precio de mercado de la opción, estimado como el punto medio entre oferta y demanda, era de \$8.80. El precio obtenido con nuestro modelo (usando el método PSOR) fue de \$8.799. A pesar de las incertidumbres en los parámetros de entrada, el resultado del modelo es muy cercano al precio de mercado y es consistente con el valor de referencia de QuantLib. Además, el modelo captura adecuadamente el valor del ejercicio temprano, estimado en \$0.017 por encima del precio de una opción europea equivalente (\$8.783), lo que demuestra su validez para este tipo de instrumentos.
 
 \begin{thebibliography}{9}
 \bibitem{Hull}
 J. C. Hull, \emph{Options, Futures, and Other Derivatives}, Sección 21.8.
+
+\bibitem{Liu2008}
+Y. Liu, \emph{Numerical methods for American options}, Tesis de Maestría, Universidad de Waterloo, 2008.
+
 \end{thebibliography}
 
 \end{document}
