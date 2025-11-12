@@ -1,0 +1,218 @@
+\documentclass{beamer}
+\usetheme{Madrid}  % Replaced UniKlu (missing) with a standard built-in theme
+\usepackage{booktabs}
+\usepackage{amssymb}
+
+\title{Diferencias finitas para valorar opciones americanas\\con cambio de variable $Z \to \ln S$}
+ 	
+
+\author{Mikael Rodriguez \\ Tomás Gómez Pizarro}
+\institute{FAMAF - Universidad Nacional de Córdoba}
+\date{Noviembre de 2025}
+
+
+\begin{document}
+	
+\begin{frame}[noframenumbering,plain]
+    \maketitle
+\end{frame}
+
+\section{El Problema}
+
+\begin{frame}{La Ecuación Diferencial}
+    El valor de una opción, $V(S, t)$, satisface la Ecuación Diferencial Parcial de Black-Scholes:
+    \begin{equation*}
+        \frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + (r-q)S \frac{\partial V}{\partial S} - rV = 0
+    \end{equation*}
+    
+    \uncover<2->{
+    Para resolverla numéricamente: \textbf{Diferencias Finitas} \(\to\) Discretizar el dominio y aproximar las derivadas:
+    \[
+        \frac{\partial V}{\partial S} \approx \frac{V_{i+1} - V_{i-1}}{2\Delta S}, \quad
+        \frac{\partial^2 V}{\partial S^2} \approx \frac{V_{i+1} - 2V_i + V_{i-1}}{(\Delta S)^2}
+    \]
+    }
+    
+    \uncover<3->{Pero, ¿Es la misma para las europeas que para las americanas?}
+\end{frame}
+
+\begin{frame}[fragile]{Opciones Americanas: Un Problema Complejo}
+    Para una opción americana, la EDP se convierte en un \textbf{Problema de Complementariedad Lineal (LCP)}, donde en cada punto del dominio se debe cumplir una de dos condiciones:
+    \begin{columns}[T] % Alinea las columnas por la parte superior
+        \begin{column}{.5\textwidth}
+            \begin{enumerate}
+                \item \textbf{Ejercer:} El valor de la opción es su pago intrínseco.
+                \[ V(S,t) = \text{Payoff}(S) \]
+            \end{enumerate}
+        \end{column}
+        \begin{column}{.5\textwidth}
+            \begin{enumerate}
+                \setcounter{enumi}{1}
+                \item \textbf{Continuar:} El valor lo da la EDP de Black-Scholes.
+                \[ \frac{\partial V}{\partial t} + \mathcal{L}V = 0 \]
+            \end{enumerate}
+        \end{column}
+    \end{columns}
+    
+    \uncover<2->{
+    \vspace{0.5cm}
+    Resolver este sistema directamente es complejo.
+    \vspace{0.5cm}
+    
+    \textit{Nuestra estrategia:} Resolver la EDP para la opción europea y luego aplicar un ajuste para incorporar la posibilidad de ejercicio temprano.
+    }
+\end{frame}
+
+\begin{frame}{Esquema Explícito: Solución Directa}
+    \uncover<1->{
+    Discretizamos la EDP reemplazando las derivadas por diferencias finitas.
+    \vspace{0.5cm}
+    }
+    
+    \uncover<2->{
+    Al evaluar las derivadas espaciales en el tiempo ya conocido (\(j-1\)), podemos despejar el valor de la opción en el siguiente paso (\(j\)) de forma directa:
+    \[
+        V_{i,j} = A'_i V_{i-1,j-1} + B'_i V_{i,j-1} + C'_i V_{i+1,j-1}
+    \]
+    Donde \(A'_i, B'_i, C'_i\) son coeficientes que dependen de los parámetros del modelo.
+    \vspace{0.5cm}
+    }
+    
+    \uncover<3->{
+    Para la opción \textbf{americana}, simplemente aplicamos la condición de ejercicio al final de cada paso:
+    \[
+        V_{i,j}^{\text{final}} = \max(V_{i,j}, \text{Payoff}_i)
+    \]
+    }
+    
+\end{frame}
+
+\begin{frame}{Esquema Implícito: Un Sistema de Ecuaciones}
+    \uncover<1->{
+    Aquí, las derivadas espaciales se evalúan en el tiempo \textbf{desconocido} (\(j\)).
+    \vspace{0.5cm}
+    }
+    
+    \uncover<2->{
+    Esto nos lleva a un \textbf{sistema de ecuaciones lineales tridiagonal} en cada paso:
+    \[
+        A_i V_{i-1,j} + B_i V_{i,j} + C_i V_{i+1,j} = V_{i, j-1}
+    \]
+    }
+    
+    \uncover<3->{
+    Para opciones americanas, el método de \textbf{proyección} consiste en:
+    \begin{enumerate}
+        \item Resolver el sistema lineal para obtener un valor de continuación \(V_j^{\text{hold}}\).
+        \item Aplicar la condición de ejercicio: \(V_j^{\text{final}} = \max(V_j^{\text{hold}}, \text{Payoff})\).
+    \end{enumerate}
+    }
+    
+    \uncover<4->{
+    \begin{alertblock}{Inconsistencia Teórica}
+        Aunque en la práctica funciona bien, la solución final ya no satisface el sistema lineal original.
+    \end{alertblock}
+    }
+    
+    \uncover<5->{
+    \pause
+    Para resolver esto, se usan métodos más sofisticados como \textbf{PSOR (Projected Successive Over-Relaxation)}, que incorporan la restricción en cada paso de la solución iterativa.
+    }
+\end{frame}
+
+
+\begin{frame}{Comparación de Métodos}
+    \begin{table}
+        \centering
+        \small
+        \begin{tabular}{lll}
+            \toprule
+            & \textbf{Explícito} & \textbf{Implícito} \\
+            \midrule
+            \textbf{Simplicidad} & $\checkmark$ Muy simple & Requiere sistema \\
+            \textbf{Velocidad} & $\checkmark$ Muy rápido & Más lento \\
+            \textbf{Estabilidad} & Condicionada & $\checkmark$ Incond. estable \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.3cm}
+    
+\end{frame}
+
+\section{Resultados}
+
+\begin{frame}{Comparación de Precios}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.95\textwidth]{imagenes/precio_vs_C.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Comparación de Errores}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.95\textwidth]{imagenes/error_vs_C.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Comparación de Velocidad}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.95\textwidth]{imagenes/velocidad_vs_C.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Condición de Contorno Artificial}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.95\textwidth]{imagenes/Cambio_en_L.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Valuando una Opción Real: NVIDIA}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1\textwidth]{imagenes/Opciones_reales.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Resultados Obtenidos}
+    \textbf{Opción Put Americana ATM sobre NVIDIA} (Vencimiento: 15 días)
+    
+    \vspace{0.5cm}
+    
+    \begin{table}
+        \centering
+        \small
+        \begin{tabular}{lr}
+            \toprule
+            \textbf{Parámetro/Resultado} & \textbf{Valor} \\
+            \midrule
+            Precio del activo (S) & \$189.44 \\
+            Strike (K) & \$190.00 \\
+            Volatilidad implícita ($\sigma$) & 56.47\% \\
+            Tasa libre de riesgo (r) & 3.875\% \\
+            \midrule
+            Precio de mercado & \$8.80 \\
+            Precio BS Europeo & \$8.783 \\
+            \textbf{Precio modelo (PSOR)} & \textbf{\$8.799} \\
+            \midrule
+            Valor ejercicio temprano & \$0.017 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+        
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item Item 1
+        \item Item 2
+    \end{itemize}	
+\end{frame}
+
+	
+\end{document}
